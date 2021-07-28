@@ -1,0 +1,135 @@
+\usepackage[english]{babel}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{amssymb,amsmath}
+\usepackage[english]{cleveref}
+\usepackage{geometry}
+\usepackage{titling}
+\usepackage[inline]{enumitem}
+\usepackage{setspace}
+\usepackage{fancyhdr}
+
+\fancypagestyle{plain}{
+	\fancyhf{}
+	\fancyfoot[RE,LO]{\leftmark}
+	\fancyfoot[LE,RO]{\thepage}
+	\renewcommand{\footrulewidth}{1pt}
+}
+
+\fancypagestyle{fancy}{
+	\fancyhf{}
+	\fancyhead[CE,CO]{\rightmark}
+	\fancyfoot[RE,LO]{\leftmark}
+	\fancyfoot[LE,RO]{\thepage}
+	\renewcommand{\headrulewidth}{1pt}
+	\renewcommand{\footrulewidth}{1pt}
+	\setlength{\headheight}{14.49998pt}
+	\addtolength{\topmargin}{-2.49998pt}
+}
+
+\pagestyle{fancy}
+
+\newcommand{\acknowledgementsname}{Acknowledgements}
+
+\newcommand{\school}[1]{\def\theschool{#1}}
+\newcommand{\programme}[1]{\def\theprogramme{#1}}
+\newcommand{\contestsector}[1]{\def\thecontestsector{#1}}
+\newcommand{\scientificsector}[1]{\def\thescientificsector{#1}}
+\newcommand{\coordinator}[1]{\def\thecoordinator{#1}}
+\newcommand{\supervisor}[1]{\def\thesupervisor{#1}}
+\newcommand{\cycle}[1]{\def\thecycle{#1}}
+\newcommand{\examyear}[1]{\def\theexamyear{#1}}
+
+\newenvironment{abstract}{\chapter*{\centering\abstractname}\addcontentsline{toc}{chapter}{\abstractname}}{} 
+\newenvironment{acknowledgements}{\chapter*{\acknowledgementsname}}{} 
+\newenvironment{dedication}{\chapter*{}\begin{flushright}\itshape}{\normalfont\end{flushright}}
+\newenvironment{inlinelist}{\begin{enumerate*}[label=\emph{(\roman{*})}]}{\end{enumerate*}}
+
+\newcommand{\chapterWithoutNumber}[1]{\chapter*{#1}\addcontentsline{toc}{chapter}{#1}}
+
+\let\oldbibliography\bibliography
+\renewcommand{\bibliography}[1]{
+	\addcontentsline{toc}{part}{}
+	\addcontentsline{toc}{chapter}{\bibname}
+	\oldbibliography{#1}
+}
+
+\def\themainlinespacing{1}
+\newcommand{\mainlinespacing}[1]{\def\themainlinespacing{#1}}
+\let\oldmainmatter\mainmatter
+\renewcommand{\mainmatter}{
+	\oldmainmatter
+	% \onehalfspacing % https://tex.stackexchange.com/questions/30073/why-is-the-linespread-factor-as-it-is
+	\setstretch{\themainlinespacing}
+}
+
+\newcommand{\mypapers}[2][chapter]{
+	\begin{flushright}\tiny
+		This #1 contains contributions from the following works of ours: \cite{#2}
+	\end{flushright}
+}
+
+\newcommand{\frontispiece}{
+	\newgeometry{margin=0.8in}
+	\begin{titlepage}
+		\centering
+		\large
+		\textbf{\theschool}
+		\\
+		\noindent\hrulefill
+		\vspace{0.4cm}
+		
+		\Large
+		\theprogramme
+
+		\Huge
+		\vspace{4cm}
+		\textbf{
+			\thetitle
+		}
+		
+		\large
+		\vspace{1cm}
+		Settore Concorsuale:
+		\\
+		\textsc{\thecontestsector}
+		\\\vspace{0.5cm}
+		Settore Scientifico Disciplinare:
+		\\
+		\textsc{\thescientificsector}
+
+		\vspace{4cm}
+		%
+		\begin{minipage}[t]{0.64\textwidth}
+			\begin{flushleft}
+				\textit{Coordinatore Dottorato} 
+				\\ 
+				\textbf{Prof. \thecoordinator}
+				\\
+				\vspace{0.4cm}
+				\textit{Supervisore} 
+				\\
+				\textbf{Prof. \thesupervisor}
+			\end{flushleft}
+		\end{minipage}
+		%
+		\begin{minipage}[t]{0.34\textwidth}
+			\begin{flushright}
+				\textit{Candidato} 
+				\\ 
+				\textbf{\theauthor}
+			\end{flushright}
+		\end{minipage}
+		\\
+		
+		\vfill
+		\noindent\hrulefill
+		\vspace{0.3cm}
+		\Large
+		
+		\thecycle{} Ciclo
+		\\
+		Esame Finale Anno \theexamyear
+	\end{titlepage}
+	\restoregeometry
+}
