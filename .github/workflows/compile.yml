@@ -1,51 +1,38 @@
-name: compile
+name: Build LaTeX and deploy on GitHub Releases
 on:
   push:
-    branches:
-      - master
-      - main
-env:
-  LATEX_ROOT: phd-thesis
-jobs:
-  compile:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-          
-      - name: Build latex
-        uses: xu-cheng/latex-action@v2
-        with:
-          root_file: ${{ env.LATEX_ROOT }}.tex
-          args: -pdf -file-line-error -halt-on-error -interaction=nonstopmode -shell-escape
-        
-      - name: Bump version
-        id: bump-version
-        uses: anothrNick/github-tag-action@1.22.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          DRY_RUN: true
-          
-      - name: Get Time
-        id: current-time
-        run: echo "::set-output name=time::$(date +'%Y-%m-%dT%H%M%S')"
-        
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: '${{ steps.bump-version.outputs.new_tag }}-${{ steps.current-time.outputs.time }}'
-          
-      - name: Upload Release Asset
-        id: upload-release-asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./${{ env.LATEX_ROOT }}.pdf
-          asset_name: ${{ env.LATEX_ROOT }}-${{ steps.bump-version.outputs.new_tag }}-${{ steps.current-time.outputs.time }}.pdf
-          asset_content_type: application/pdf
+  schedule:
+    - cron: '0 0 1 * *'
 
+jobs:
+  Build-LaTeX:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Make ImageMagik permissive
+        run: sudo sed -i 's/rights=".*"/rights="all"/' /etc/ImageMagick-6/policy.xml
+      # Checkout the repository
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Fetch tags
+        shell: bash
+        run: git fetch --tags -f
+      - name: Install TeXLive
+        uses: DanySK/setup-texlive-action@master
+      - name: Compile LaTeX
+        uses: DanySK/compile-latex-action@master
+      - name: Autotag
+        uses: DanySK/semver-autotag-action@master
+      - name: Deploy
+        if: ${{ startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/master' }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG=$(git describe --tags --exact-match HEAD)
+          hub release create -m "$(git tag -l --format='%(contents)' "$TAG")" "$TAG" || true
+          while IFS= read -r file; do
+            pdf="${file%.*}.pdf"
+            echo "Delivering file $pdf"
+            gh release upload "$TAG" "$pdf" --clobber
+          done <"success-list"
