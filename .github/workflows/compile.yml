@@ -24,6 +24,9 @@ jobs:
         uses: DanySK/compile-latex-action@master
       - name: Autotag
         uses: DanySK/semver-autotag-action@master
+      - name: Install hub
+        run: |
+          sudo apt-get install -y hub
       - name: Deploy
         if: ${{ startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/master' }}
         env:
