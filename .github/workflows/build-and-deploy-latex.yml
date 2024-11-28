@@ -67,7 +67,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: '${{ steps.bump-version.outputs.new_tag }}-${{ steps.current-time.outputs.time }}'
-          release_name: Release '${{ steps.bump-version.outputs.new_tag }}-${{ steps.current-time.outputs.time }}'
+          release_name: '${{ env.PAPER_BASE_NAME }}-${{ steps.bump-version.outputs.new_tag }}-${{ steps.current-time.outputs.time }}'
 
       - name: Upload Release Asset
         id: upload-release-asset-cv
