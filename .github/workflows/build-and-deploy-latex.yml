@@ -44,7 +44,7 @@ jobs:
           ruby bibtex_prettifier.rb
 
       - name: Compile LaTeX
-        uses: xu-cheng/latex-action@v3
+        uses: xu-cheng/latex-action@v4
         with:
           root_file: ${{ env.PAPER_BASE_NAME }}.tex
           args: -pdf -file-line-error -halt-on-error -interaction=nonstopmode -shell-escape
